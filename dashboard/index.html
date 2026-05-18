@@ -190,10 +190,49 @@
   .action-dot.today { background: var(--amber); }
   .action-dot.week { background: var(--accent); }
 
+  /* DELEGATION */
+  .delegation-panel { margin-bottom: 20px; padding: 18px 20px; }
+  .delegation-summary {
+    font-size: 12px; color: var(--muted); margin: 8px 0 16px;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .delegation-summary strong { color: #fff; }
+  .delegation-summary .sep { font-weight: bold; }
+  .del-stat.overdue { color: var(--red); }
+  .del-stat.approaching { color: var(--amber); }
+  .delegation-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .delegate-card {
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+  }
+  .delegate-name {
+    font-size: 13px; color: #fff; font-weight: 700; margin-bottom: 4px;
+  }
+  .delegate-count {
+    font-size: 11px; color: var(--muted); margin-bottom: 10px;
+  }
+  .del-badge {
+    font-size: 10px; padding: 2px 7px; border-radius: 6px;
+    font-weight: 600; margin-left: 4px;
+  }
+  .del-badge.ok { background: #0d2b1a; color: var(--green); }
+  .del-badge.overdue { background: #3d1111; color: var(--red); }
+  .del-badge.warn { background: #332400; color: var(--amber); }
+  .delegate-task {
+    font-size: 11px; color: var(--muted); padding: 4px 0;
+    border-bottom: 1px solid #1a1f2a; line-height: 1.4;
+  }
+  .delegate-task:last-child { border-bottom: none; }
+  .delegate-task.overdue { color: var(--red); }
+  .delegate-task.approaching { color: var(--amber); }
+
   /* Mobile */
   @media (max-width: 900px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .agenda-grid { grid-template-columns: 1fr; }
+    .delegation-grid { grid-template-columns: repeat(2, 1fr); }
     .bottom-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 500px) {
@@ -308,6 +347,46 @@
           <div class="action-item"><span class="action-dot today"></span>XYZ İnşaat görüşme notları</div>
           <div class="action-item"><span class="action-dot today"></span>Akaryakıt siparişi onayı</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELEGASYON -->
+  <div class="panel delegation-panel">
+    <h3>🎯 Delegasyon Durumu</h3>
+    <div class="delegation-summary">
+      <span>Toplam: <strong id="del-total">8</strong> görev</span>
+      <span class="sep">·</span>
+      <span><strong id="del-people">4</strong> kişi</span>
+      <span class="sep">·</span>
+      <span class="del-stat overdue">Gecikmiş: <strong id="del-overdue">2</strong></span>
+      <span class="sep">·</span>
+      <span class="del-stat approaching">Yaklaşan: <strong id="del-approaching">1</strong></span>
+    </div>
+    <div class="delegation-grid" id="delegation-list">
+      <div class="delegate-card">
+        <div class="delegate-name">Ahmet Bey</div>
+        <div class="delegate-count">2 görev <span class="del-badge overdue">1 gecikmiş</span></div>
+        <div class="delegate-task overdue">KV Router Redis LangCache — 18 Mayıs ⚠</div>
+        <div class="delegate-task">SGK fark ücreti güncelleme — 22 Mayıs</div>
+      </div>
+      <div class="delegate-card">
+        <div class="delegate-name">Mehmet Bey</div>
+        <div class="delegate-count">2 görev <span class="del-badge ok">tümü zamanında</span></div>
+        <div class="delegate-task">Komtaş Scope Clarifier — 20 Mayıs</div>
+        <div class="delegate-task">UAOL BOBJ canlı test — 25 Mayıs</div>
+      </div>
+      <div class="delegate-card">
+        <div class="delegate-name">Ayşe Hanım</div>
+        <div class="delegate-count">2 görev <span class="del-badge warn">1 yaklaşıyor</span></div>
+        <div class="delegate-task approaching">BOBJ mock rapor ekleme — Yarın 12:00 ⚡</div>
+        <div class="delegate-task">Odoo migration planı — 21 Mayıs</div>
+      </div>
+      <div class="delegate-card">
+        <div class="delegate-name">Can Bey</div>
+        <div class="delegate-count">2 görev <span class="del-badge overdue">1 gecikmiş</span></div>
+        <div class="delegate-task overdue">Industry crawler keyword — 17 Mayıs ⚠</div>
+        <div class="delegate-task">Türk Telekom demo sunumu — 23 Mayıs</div>
       </div>
     </div>
   </div>

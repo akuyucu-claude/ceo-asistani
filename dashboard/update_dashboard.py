@@ -65,6 +65,10 @@ def read_vault(vault_path: str) -> dict:
             'meetings': [],
             'overdue_count': 0, 'today_count': 0, 'week_count': 0,
             'overdue': [], 'today': []
+        },
+        'delegation': {
+            'total': 0, 'people': 0, 'overdue': 0, 'approaching': 0,
+            'cards': [], 'tasks': []
         }
     }
 
@@ -157,6 +161,21 @@ def read_vault(vault_path: str) -> dict:
         data['agenda']['week_count'] = int(hs) if hs else 0
         data['agenda']['overdue'] = parse_markdown_list(str(aksiyon_path), 'Gecikmiş')
         data['agenda']['today'] = parse_markdown_list(str(aksiyon_path), 'Bugün')
+
+    # Delegasyon
+    delegasyon_path = v / 'delegasyon' / 'aktif.md'
+    if delegasyon_path.exists():
+        data['delegation'] = {'total': 0, 'people': 0, 'overdue': 0, 'approaching': 0, 'cards': []}
+        dt = parse_markdown_value(str(delegasyon_path), 'toplam')
+        data['delegation']['total'] = int(dt) if dt else 0
+        dp = parse_markdown_value(str(delegasyon_path), 'gecikmis_sayisi')
+        data['delegation']['overdue'] = int(dp) if dp else 0
+        da = parse_markdown_value(str(delegasyon_path), 'yaklasiyor_sayisi')
+        data['delegation']['approaching'] = int(da) if da else 0
+        dk = parse_markdown_value(str(delegasyon_path), 'kisi_sayisi')
+        data['delegation']['people'] = int(dk) if dk else 0
+        data['delegation']['cards'] = parse_markdown_list(str(delegasyon_path), 'Kişi Bazında')
+        data['delegation']['tasks'] = parse_markdown_list(str(delegasyon_path), 'Delegasyonlar')
 
     # Şirket adı
     sirket_path = v / 'sirket.md'
@@ -315,6 +334,66 @@ def generate_html(data: dict, template_path: str) -> str:
         html = re.sub(r'(<div class="action-section-title today">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>)',
                       f'<div class="action-section-title today">🟡 Bugün</div>\n{today_html}',
                       html, flags=re.DOTALL)
+
+    # Delegasyon
+    delegation = data.get('delegation', {})
+    if delegation.get('total', 0) > 0:
+        html = re.sub(r'id="del-total">.*?</strong>',
+                      f'id="del-total">{delegation["total"]}</strong>', html)
+        html = re.sub(r'id="del-people">.*?</strong>',
+                      f'id="del-people">{delegation["people"]}</strong>', html)
+        html = re.sub(r'id="del-overdue">.*?</strong>',
+                      f'id="del-overdue">{delegation["overdue"]}</strong>', html)
+        html = re.sub(r'id="del-approaching">.*?</strong>',
+                      f'id="del-approaching">{delegation["approaching"]}</strong>', html)
+
+        # Build delegate cards from tasks grouped by person
+        if delegation.get('tasks'):
+            # Group tasks by person
+            persons = {}
+            for t in delegation['tasks']:
+                parts = [p.strip() for p in t.split('|')]
+                if len(parts) >= 5:
+                    person = parts[2]
+                    if person not in persons:
+                        persons[person] = []
+                    persons[person].append({
+                        'id': parts[0],
+                        'gorev': parts[1],
+                        'deadline': parts[3],
+                        'durum': parts[4]
+                    })
+            
+            # Build person cards
+            cards_html = ''
+            for person_name, tasks in persons.items():
+                overdue_count = sum(1 for t in tasks if t['durum'] == 'gecikmis')
+                approaching_count = sum(1 for t in tasks if t['durum'] == 'yaklasiyor')
+                
+                if overdue_count > 0:
+                    badge_class = 'overdue'
+                    badge_text = f'{overdue_count} gecikmiş'
+                elif approaching_count > 0:
+                    badge_class = 'warn'
+                    badge_text = f'{approaching_count} yaklaşıyor'
+                else:
+                    badge_class = 'ok'
+                    badge_text = 'tümü zamanında'
+                
+                cards_html += f'''      <div class="delegate-card">
+        <div class="delegate-name">{person_name}</div>
+        <div class="delegate-count">{len(tasks)} görev <span class="del-badge {badge_class}">{badge_text}</span></div>\n'''
+                
+                for task in tasks:
+                    status_class = 'overdue' if task['durum'] == 'gecikmis' else ('approaching' if task['durum'] == 'yaklasiyor' else '')
+                    icon = '⚠' if task['durum'] == 'gecikmis' else ('⚡' if task['durum'] == 'yaklasiyor' else '')
+                    cards_html += f'        <div class="delegate-task {status_class}">{task["gorev"]} — {task["deadline"]} {icon}</div>\n'
+                
+                cards_html += '      </div>\n'
+            
+            html = re.sub(r'<div class="delegation-grid" id="delegation-list">.*?</div>\s*</div>\s*<!-- ALERTS',
+                          f'<div class="delegation-grid" id="delegation-list">\n{cards_html}    </div>\n  </div>\n\n  <!-- ALERTS',
+                          html, flags=re.DOTALL)
 
     # Date
     date_str = f'{now.day} {months_tr[now.month-1]} {now.year}, {days_tr[now.weekday()]}'
