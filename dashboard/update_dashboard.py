@@ -59,7 +59,13 @@ def read_vault(vault_path: str) -> dict:
         'tasks': {'total': 0, 'critical': 0, 'projects': 0},
         'alerts': [],
         'radar': [],
-        'chart_data': []
+        'chart_data': [],
+        'agenda': {
+            'date': '', 'meeting_count': 0, 'first_meeting': '',
+            'meetings': [],
+            'overdue_count': 0, 'today_count': 0, 'week_count': 0,
+            'overdue': [], 'today': []
+        }
     }
 
     # Finans verileri
@@ -130,6 +136,27 @@ def read_vault(vault_path: str) -> dict:
     chart_path = v / 'finans' / 'nakit-grafik.md'
     if chart_path.exists():
         data['chart_data'] = parse_markdown_list(str(chart_path), 'veri')
+
+    # Gündem
+    gundem_path = v / 'gundem' / 'bugun.md'
+    if gundem_path.exists():
+        data['agenda']['date'] = parse_markdown_value(str(gundem_path), 'tarih')
+        mc = parse_markdown_value(str(gundem_path), 'toplanti_sayisi')
+        data['agenda']['meeting_count'] = int(mc) if mc else 0
+        data['agenda']['first_meeting'] = parse_markdown_value(str(gundem_path), 'erken_toplanti')
+        data['agenda']['meetings'] = parse_markdown_list(str(gundem_path), 'Toplantılar')
+
+    # Aksiyonlar
+    aksiyon_path = v / 'gundem' / 'aksiyonlar.md'
+    if aksiyon_path.exists():
+        gs = parse_markdown_value(str(aksiyon_path), 'gecikmis_sayisi')
+        data['agenda']['overdue_count'] = int(gs) if gs else 0
+        bs = parse_markdown_value(str(aksiyon_path), 'bugun_sayisi')
+        data['agenda']['today_count'] = int(bs) if bs else 0
+        hs = parse_markdown_value(str(aksiyon_path), 'bu_hafta_sayisi')
+        data['agenda']['week_count'] = int(hs) if hs else 0
+        data['agenda']['overdue'] = parse_markdown_list(str(aksiyon_path), 'Gecikmiş')
+        data['agenda']['today'] = parse_markdown_list(str(aksiyon_path), 'Bugün')
 
     # Şirket adı
     sirket_path = v / 'sirket.md'
@@ -226,6 +253,67 @@ def generate_html(data: dict, template_path: str) -> str:
         </div>\n'''
         html = re.sub(r'<div id="radar-list">.*?</div>\s*</div>\s*</div>\s*<!-- FOOTER',
                       f'<div id="radar-list">\n{radar_html}        </div>\n      </div>\n  </div>\n\n  <!-- FOOTER',
+                      html, flags=re.DOTALL)
+
+    # Gündem + Aksiyon
+    agenda = data['agenda']
+    # Meeting count
+    html = re.sub(r'id="meeting-count">.*?</span>', f'id="meeting-count">{agenda["meeting_count"]} toplantı</span>', html)
+    html = re.sub(r'id="first-meeting">.*?</strong>', f'id="first-meeting">{agenda["first_meeting"]}</strong>', html)
+    # Agenda date
+    months_tr_agenda = {'2026-05-18': '18 Mayıs', '2026-05-19': '19 Mayıs'}
+    agenda_date = months_tr_agenda.get(agenda['date'], agenda['date'] if agenda['date'] else 'Bugün')
+    html = re.sub(r'id="agenda-date">.*?</span>', f'id="agenda-date">{agenda_date}</span>', html)
+
+    # Meetings list
+    if agenda['meetings']:
+        meetings_html = ''
+        for m in agenda['meetings']:
+            # Format: "09:30 | İcra Kurulu | CFO, COO | Bütçe revizyonu | hazir"
+            parts = [p.strip() for p in m.split('|')]
+            if len(parts) >= 4:
+                time = parts[0]
+                title = parts[1]
+                people = parts[2]
+                topic = parts[3]
+                status = parts[4] if len(parts) > 4 else 'hazir'
+                is_ready = status == 'hazir'
+                meetings_html += f'''        <div class="meeting-item {'ready' if is_ready else 'missing'}">
+          <div class="meeting-time">{time}</div>
+          <div class="meeting-body">
+            <div class="meeting-title">{title}</div>
+            <div class="meeting-detail">👥 {people}</div>
+            <div class="meeting-detail">📋 {topic}</div>
+          </div>
+          <div class="meeting-badge {'ok' if is_ready else 'warn'}">{'✓ Hazır' if is_ready else '⚡ Eksik hazırlık'}</div>
+        </div>\n'''
+        html = re.sub(r'<div id="meetings-list">.*?</div>\s*</div>\s*<!-- AKSIYON',
+                      f'<div id="meetings-list">\n{meetings_html}      </div>\n    </div>\n\n    <!-- AKSIYON',
+                      html, flags=re.DOTALL)
+
+    # Action counts
+    html = re.sub(r'id="overdue-count">.*?</strong>', f'id="overdue-count">{agenda["overdue_count"]}</strong>', html)
+    html = re.sub(r'id="today-count">.*?</strong>', f'id="today-count">{agenda["today_count"]}</strong>', html)
+    html = re.sub(r'id="week-count">.*?</strong>', f'id="week-count">{agenda["week_count"]}</strong>', html)
+
+    # Action items - overdue
+    if agenda['overdue']:
+        overdue_html = '\n'.join([
+            f'          <div class="action-item"><span class="action-dot critical"></span>{item}</div>'
+            for item in agenda['overdue']
+        ])
+        html = re.sub(r'(<div class="action-section-title critical">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>)',
+                      f'<div class="action-section-title critical">🔴 Gecikmiş</div>\n{overdue_html}',
+                      html, flags=re.DOTALL)
+
+    # Action items - today
+    if agenda['today']:
+        today_html = '\n'.join([
+            f'          <div class="action-item"><span class="action-dot today"></span>{item}</div>'
+            for item in agenda['today']
+        ])
+        html = re.sub(r'(<div class="action-section-title today">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>\s*<div class="action-item">.*?</div>)',
+                      f'<div class="action-section-title today">🟡 Bugün</div>\n{today_html}',
                       html, flags=re.DOTALL)
 
     # Date

@@ -126,9 +126,74 @@
     display: flex; justify-content: space-between; font-size: 11px; color: var(--muted);
   }
 
+  /* AGENDA GRID */
+  .agenda-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 20px;
+  }
+  .agenda-panel { padding: 18px 20px; }
+  .agenda-meta {
+    font-size: 12px; color: var(--muted); margin: 6px 0 16px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .agenda-meta strong { color: #fff; }
+  .agenda-dot { font-weight: bold; }
+
+  .meeting-item {
+    display: flex; gap: 12px; padding: 12px;
+    border-radius: 8px; margin-bottom: 8px;
+    border: 1px solid var(--border);
+  }
+  .meeting-item.ready { border-left: 3px solid var(--green); }
+  .meeting-item.missing { border-left: 3px solid var(--amber); background: #1a1400; }
+  .meeting-time {
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    min-width: 40px; padding-top: 2px;
+  }
+  .meeting-body { flex: 1; }
+  .meeting-title { font-size: 13px; color: #fff; font-weight: 600; }
+  .meeting-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .meeting-badge {
+    font-size: 10px; font-weight: 700; padding: 4px 8px;
+    border-radius: 6px; white-space: nowrap; align-self: center;
+  }
+  .meeting-badge.ok { background: #0d2b1a; color: var(--green); }
+  .meeting-badge.warn { background: #332400; color: var(--amber); }
+
+  .action-counts {
+    display: flex; gap: 10px; margin: 8px 0 14px; flex-wrap: wrap;
+  }
+  .action-badge {
+    font-size: 11px; padding: 5px 10px; border-radius: 8px;
+  }
+  .action-badge.critical { background: #3d1111; color: var(--red); }
+  .action-badge.today { background: #332400; color: var(--amber); }
+  .action-badge.week { background: #0d1b2e; color: var(--accent); }
+  .action-badge strong { font-size: 16px; margin-left: 2px; }
+
+  .action-section { margin-bottom: 12px; }
+  .action-section:last-child { margin-bottom: 0; }
+  .action-section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .action-section-title.critical { color: var(--red); }
+  .action-section-title.today { color: var(--amber); }
+  .action-item {
+    font-size: 12px; color: var(--text); padding: 3px 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .action-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .action-dot.critical { background: var(--red); }
+  .action-dot.today { background: var(--amber); }
+  .action-dot.week { background: var(--accent); }
+
   /* Mobile */
   @media (max-width: 900px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .agenda-grid { grid-template-columns: 1fr; }
     .bottom-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 500px) {
@@ -176,6 +241,74 @@
       <div class="value" id="tasks">27</div>
       <div class="trend warn">14 kritik</div>
       <div class="sub">6 proje aktif</div>
+    </div>
+  </div>
+
+  <!-- GÜNDEM + AKSIYON -->
+  <div class="agenda-grid">
+    <!-- BUGÜNKÜ GÜNDEM -->
+    <div class="panel agenda-panel">
+      <h3>📅 Bugünkü Gündem — <span id="agenda-date">18 Mayıs</span></h3>
+      <div class="agenda-meta">
+        <span id="meeting-count">3 toplantı</span>
+        <span class="agenda-dot">·</span>
+        <span>İlk: <strong id="first-meeting">09:30</strong></span>
+      </div>
+      <div id="meetings-list">
+        <div class="meeting-item ready">
+          <div class="meeting-time">09:30</div>
+          <div class="meeting-body">
+            <div class="meeting-title">İcra Kurulu Toplantısı</div>
+            <div class="meeting-detail">👥 CFO, COO, Teknik Müdür</div>
+            <div class="meeting-detail">📋 Bütçe revizyonu, ihale durumu</div>
+          </div>
+          <div class="meeting-badge ok">✓ Hazır</div>
+        </div>
+        <div class="meeting-item ready">
+          <div class="meeting-time">11:00</div>
+          <div class="meeting-body">
+            <div class="meeting-title">XYZ İnşaat — Tahsilat Görüşmesi</div>
+            <div class="meeting-detail">👥 Mali İşler Müdürü</div>
+            <div class="meeting-detail">⚠ 620K TL gecikmiş tahsilat</div>
+          </div>
+          <div class="meeting-badge ok">✓ Hazır</div>
+        </div>
+        <div class="meeting-item missing">
+          <div class="meeting-time">14:30</div>
+          <div class="meeting-body">
+            <div class="meeting-title">İstanbul BB İhale — Teknik Toplantı</div>
+            <div class="meeting-detail">👥 Teknik ekip</div>
+            <div class="meeting-detail">📋 Son başvuru: 31 Mayıs (13 gün)</div>
+          </div>
+          <div class="meeting-badge warn">⚡ Eksik hazırlık</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AKSIYON TAKIP -->
+    <div class="panel agenda-panel">
+      <h3>✅ Aksiyon Takip</h3>
+      <div class="action-counts">
+        <span class="action-badge critical">🔴 Gecikmiş <strong id="overdue-count">3</strong></span>
+        <span class="action-badge today">🟡 Bugün <strong id="today-count">5</strong></span>
+        <span class="action-badge week">🔵 Bu Hafta <strong id="week-count">11</strong></span>
+      </div>
+      <div id="actions-list">
+        <div class="action-section">
+          <div class="action-section-title critical">🔴 Gecikmiş</div>
+          <div class="action-item"><span class="action-dot critical"></span>ABC Demir sipariş takibi — 2 gün</div>
+          <div class="action-item"><span class="action-dot critical"></span>Metro Yapı hak ediş onayı — 4 gün</div>
+          <div class="action-item"><span class="action-dot critical"></span>E-fatura Mayıs kapanış kontrolü</div>
+        </div>
+        <div class="action-section">
+          <div class="action-section-title today">🟡 Bugün</div>
+          <div class="action-item"><span class="action-dot today"></span>İcra kurulu sunumu hazırla</div>
+          <div class="action-item"><span class="action-dot today"></span>SGK bildirim onayı</div>
+          <div class="action-item"><span class="action-dot today"></span>Yeni iş makinesi kiralama kararı</div>
+          <div class="action-item"><span class="action-dot today"></span>XYZ İnşaat görüşme notları</div>
+          <div class="action-item"><span class="action-dot today"></span>Akaryakıt siparişi onayı</div>
+        </div>
+      </div>
     </div>
   </div>
 
