@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="3600">
+<title>AK Yapı İnşaat — CEO Asistanı</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #131820;
+    --border: #1e2736;
+    --text: #c8d6e5;
+    --muted: #667788;
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --amber: #ffb74d;
+    --purple: #ab47bc;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+  }
+  .header-left h1 { font-size: 22px; font-weight: 700; color: #fff; }
+  .header-left .subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .header-right {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 13px; color: var(--muted);
+  }
+  .agent-status {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 20px;
+    background: #0d2b1a; color: var(--green); font-size: 12px; font-weight: 600;
+  }
+  .agent-status .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* KPI Grid */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-card .value { font-size: 28px; font-weight: 700; color: #fff; margin: 6px 0 2px; }
+  .kpi-card .trend { font-size: 13px; }
+  .kpi-card .trend.up { color: var(--green); }
+  .kpi-card .trend.warn { color: var(--amber); }
+  .kpi-card .trend.down { color: var(--red); }
+  .kpi-card .sub { font-size: 12px; color: var(--muted); }
+
+  /* Alerts */
+  .alerts {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px;
+  }
+  .alerts h3 { font-size: 13px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .alert-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-badge {
+    padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  }
+  .alert-badge.critical { background: #3d1111; color: var(--red); }
+  .alert-badge.warning { background: #332400; color: var(--amber); }
+
+  /* Bottom Grid */
+  .bottom-grid {
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;
+  }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .panel h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+
+  /* Chart (ASCII-style bars with CSS) */
+  .chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding-top: 10px; }
+  .chart-bar {
+    flex: 1; border-radius: 4px 4px 0 0; position: relative;
+    min-width: 12px; background: linear-gradient(to top, var(--accent), #81d4fa);
+    opacity: 0.85; transition: opacity 0.3s;
+  }
+  .chart-bar:hover { opacity: 1; }
+  .chart-bar .tooltip {
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: var(--muted); white-space: nowrap;
+  }
+  .chart-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--muted); }
+
+  /* Radar items */
+  .radar-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .radar-item:last-child { border-bottom: none; }
+  .radar-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .radar-icon.price { background: #1a1a2e; } 
+  .radar-icon.tender { background: #1a2e1a; }
+  .radar-icon.competitor { background: #2e1a1a; }
+  .radar-body .title { font-size: 13px; color: #fff; }
+  .radar-body .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Footer */
+  .footer {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; font-size: 11px; color: var(--muted);
+  }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .bottom-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 500px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>AK Yapı İnşaat</h1>
+      <div class="subtitle">CEO Asistanı — Komuta Merkezi</div>
+    </div>
+    <div class="header-right">
+      <span id="date">18 Mayıs 2026, Perşembe</span>
+      <div class="agent-status"><span class="dot"></span> Canlı</div>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="label">Nakit Pozisyonu</div>
+      <div class="value" id="cash">₺2.847.000</div>
+      <div class="trend up">↗ %12 aylık</div>
+      <div class="sub">3 banka hesabı toplamı</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Tahsilat Bekleyen</div>
+      <div class="value" id="receivables">₺1.230.000</div>
+      <div class="trend warn">⚠ 7 fatura gecikmiş</div>
+      <div class="sub">Toplam 23 açık fatura</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Bu Ay Nakit Akış</div>
+      <div class="value" id="cashflow">+₺412.000</div>
+      <div class="trend up">↗ projeksiyon +₺680K</div>
+      <div class="sub">Giriş ₺1.84M / Çıkış ₺1.43M</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Açık İşler</div>
+      <div class="value" id="tasks">27</div>
+      <div class="trend warn">14 kritik</div>
+      <div class="sub">6 proje aktif</div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="alerts">
+    <h3>⚠ Dikkat Gerektirenler</h3>
+    <div id="alerts-list">
+      <div class="alert-item">
+        <span class="alert-badge critical">Tahsilat</span>
+        XYZ İnşaat — 620.000 TL, 12 gün gecikti. Hatırlatma mail'i bugün atıldı.
+      </div>
+      <div class="alert-item">
+        <span class="alert-badge warning">SGK</span>
+        Mayıs ayı SGK bildirimi son gün: 23 Mayıs 2026 (5 gün kaldı).
+      </div>
+      <div class="alert-item">
+        <span class="alert-badge critical">Tedarik</span>
+        ABC Demir — 45 ton inşaat demiri siparişi teslim tarihi 2 gün geçti.
+      </div>
+      <div class="alert-item">
+        <span class="alert-badge warning">İhale</span>
+        İstanbul Büyükşehir Belediyesi yol yapım ihalesi — son başvuru 31 Mayıs.
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="bottom-grid">
+    <!-- CASH FLOW CHART -->
+    <div class="panel">
+      <h3>Nakit Akışı — Son 30 Gün (TL)</h3>
+      <div class="chart" id="chart"></div>
+      <div class="chart-labels">
+        <span>19 Nis</span><span>24 Nis</span><span>29 Nis</span><span>4 May</span><span>9 May</span><span>14 May</span><span>18 May</span>
+      </div>
+    </div>
+
+    <!-- INDUSTRY RADAR -->
+    <div class="panel">
+      <h3>Sektör Radarı</h3>
+      <div id="radar-list">
+        <div class="radar-item">
+          <div class="radar-icon price">📊</div>
+          <div class="radar-body">
+            <div class="title">Demir-çelik fiyatları %3 arttı</div>
+            <div class="desc">Kardemir yeni liste fiyatlarını açıkladı. Ton başına +450 TL.</div>
+          </div>
+        </div>
+        <div class="radar-item">
+          <div class="radar-icon tender">🏗</div>
+          <div class="radar-body">
+            <div class="title">Yeni ihale: İstanbul BB yol yapım</div>
+            <div class="desc">Yaklaşık maliyet 180M TL. 4 etap, 22 km asfalt.</div>
+          </div>
+        </div>
+        <div class="radar-item">
+          <div class="radar-icon competitor">🏢</div>
+          <div class="radar-body">
+            <div class="title">YapıMerkez yeni ekipman yatırımı</div>
+            <div class="desc">3 adet yeni ekskavatör + 2 kamyon filosuna ekledi.</div>
+          </div>
+        </div>
+        <div class="radar-item">
+          <div class="radar-icon price">📋</div>
+          <div class="radar-body">
+            <div class="title">Akaryakıt fiyatları sabit</div>
+            <div class="desc">Motorin 42.70 TL/lt. Son 2 haftadır değişiklik yok.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>CEO Asistanı · Hermes Agent · KV Router</span>
+    <span id="updated">Son güncelleme: 18 May 2026 10:03</span>
+  </div>
+
+</div>
+
+<script>
+// Generate chart bars from data
+const chartData = [2100,1950,2200,2400,2600,2350,2500,2700,2550,2400,2650,2850,2750,2600,2500,2680,2900,3100,2950,2800,2700,2850,3050,3200,3000,2950,3100,3300,3150,2847];
+const maxVal = Math.max(...chartData) * 1.1;
+const chart = document.getElementById('chart');
+
+chartData.forEach(val => {
+  const bar = document.createElement('div');
+  bar.className = 'chart-bar';
+  bar.style.height = (val / maxVal * 100) + '%';
+  const tooltip = document.createElement('div');
+  tooltip.className = 'tooltip';
+  tooltip.textContent = '₺' + (val/1000).toFixed(0) + 'K';
+  bar.appendChild(tooltip);
+  chart.appendChild(bar);
+});
+
+// Today's date in Turkish
+const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+const now = new Date();
+document.getElementById('date').textContent = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ', ' + days[now.getDay()];
+document.getElementById('updated').textContent = 'Son güncelleme: ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ' ' +
+  String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+</script>
+</body>
+</html>
