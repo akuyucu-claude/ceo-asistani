@@ -1,11 +1,11 @@
-# Architecture — Hermes-based Vertical AI Junior Platform
+# Architecture — Hermes-based Vertical AI Asistan Platform
 
 **Status:** Planning · **Owner:** Platform · **Last updated:** 2026-05-19
 
 This document describes the shared technical architecture behind two products:
 
-- **Otel Asistanı** — AI Önbüro Juniorı for independent boutique hotels (`PRD-otel-asistani.md`)
-- **Acente Asistanı** — AI Rezervasyon Juniorı for inbound DMCs / tour operators (`PRD-acente-asistani.md`)
+- **Otel Asistanı** — AI Önbüro Asistanı for independent boutique hotels (`PRD-otel-asistani.md`)
+- **Acente Asistanı** — AI Rezervasyon Asistanı for inbound DMCs / tour operators (`PRD-acente-asistani.md`)
 
 Both products share one codebase, one runtime, and one operational model. They diverge at the **vertical module layer**.
 
@@ -75,7 +75,7 @@ All skills are markdown files with Hermes frontmatter. They are grouped into thr
 
 ### L1 — Core (every customer, every vertical)
 
-The "junior employee scaffolding." No customer goes live without these.
+The "office assistant scaffolding." No customer goes live without these.
 
 | Skill | Purpose |
 |---|---|

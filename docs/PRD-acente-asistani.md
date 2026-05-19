@@ -1,14 +1,14 @@
 # PRD — Acente Asistanı
 
 **Product codename:** `acente-asistani`
-**Tagline:** *AI Rezervasyon Juniorı for inbound DMCs and tour operators in Türkiye*
+**Tagline:** *AI Rezervasyon Asistanı for inbound DMCs and tour operators in Türkiye*
 **Status:** Draft v1 · **Owner:** Product · **Last updated:** 2026-05-19
 
 ---
 
 ## 1. Summary
 
-Acente Asistanı is a managed AI agent that performs the work of a junior reservations / operations employee for **mid-size inbound DMCs** (Destination Management Companies) and **tour operators** operating in Türkiye. It runs on the shared Hermes-based platform (see `ARCHITECTURE.md`) with the `modules/acente/` vertical pack enabled.
+Acente Asistanı is a managed AI agent that performs the reservations / operations work for **mid-size inbound DMCs** (Destination Management Companies) and **tour operators** operating in Türkiye. It runs on the shared Hermes-based platform (see `ARCHITECTURE.md`) with the `modules/acente/` vertical pack enabled.
 
 It does six things:
 
@@ -94,7 +94,7 @@ There is no integrated AI agent product targeting Turkish inbound DMCs today. In
 |---|---|---|
 | Owner | Champion | Conversion uplift + speed → revenue story |
 | Operasyon Müdürü | Champion | Workload reducer, observability into team |
-| Senior reservations agent | Mixed — afraid of replacement | "Junior helper" positioning + their edits become training data → they're senior, AI is junior |
+| Senior reservations agent | Mixed — afraid of replacement | "Asistan" positioning + their edits become training data → they remain senior, AI is the asistan |
 | Junior reservations agent | Mixed | Frame as their personal assistant, not their replacement |
 | Accountant | Neutral / positive | Currency tracking helps margins |
 
@@ -102,11 +102,11 @@ There is no integrated AI agent product targeting Turkish inbound DMCs today. In
 
 ## 5. Positioning
 
-**Headline:** *Bir junior rezervasyon çalışanının yaptığı işi, 5 dilde, 5 dakikada yapar. Ayda ₺75K.*
+**Headline:** *Bir rezervasyon personelinin yaptığı işi, 5 dilde, 5 dakikada yapar. Ayda ₺75K.*
 
 **Anchor comparison:**
 
-| | Junior rezervasyon çalışanı | Acente Asistanı |
+| | Rezervasyon personeli (yeni alım) | Acente Asistanı |
 |---|---|---|
 | Aylık maliyet (yüklü) | ₺40,000–80,000 | ₺75,000 |
 | Çalışma süresi | 8 saat / gün | 24 saat / gün |
@@ -520,7 +520,7 @@ Inherits the platform stance (`docs/ARCHITECTURE.md` §12). DMC-specific additio
 | TRY collapse impacts customer ACV | Medium | Critical | Quarterly TRY review clause; option for partial USD billing |
 | Competitor (Travel Studio + AI) ships first | Medium | High | Hermes architecture lets us ship features faster than a Java-stack incumbent; speed advantage real |
 | Inquiry volume spike during peak overruns inference cost | Medium | Medium | Per-customer monthly cap; cheap-model demotion |
-| Customer agents resist "junior" framing as condescending | Low | Medium | Test naming with first 5 design partners |
+| "Asistan" framing tone-deaf in some DMC contexts | Low | Low | "Junior" already dropped after Turkish-cultural feedback; "Asistan" tested with first 5 design partners |
 
 ---
 
@@ -555,7 +555,7 @@ The Türsab angle is potentially the highest-leverage move for this product. Tü
 **Two parallel tracks:**
 
 1. **Direct DMC sales** (Track A) — Months 1–12. Founder-led outbound. 30–40 paying customers target.
-2. **Türsab association partnership** (Track B) — Months 3–18. Pursue "preferred AI vendor" or "AI Junior pilot" status. Mechanism: Komtaş existing relationship + our DMC traction as proof.
+2. **Türsab association partnership** (Track B) — Months 3–18. Pursue "preferred AI vendor" or "AI Asistan pilot" status. Mechanism: Komtaş existing relationship + our DMC traction as proof.
 
 Track B success would dramatically reduce CAC and unlock the long tail of small DMCs we currently exclude from ICP. But it's not a substitute for Track A — Türsab moves slowly, and we need our own paying customers before they take us seriously.
 
@@ -583,7 +583,7 @@ Track B success would dramatically reduce CAC and unlock the long tail of small 
 ## 19. Open questions
 
 1. **Catalog parsing quality:** is the canonical Google Sheet acceptable to operators, or must we accept Word / Notion / PDF natively V1? — Pilot with 3 design partners' real catalogs.
-2. **"Junior" naming:** does it land in Turkish DMC culture or feel patronising? — Test with first 5 conversations.
+2. **"Asistan" naming:** confirmed after "junior" was rejected as culturally off. Sub-question: does "Asistan" need regional variants (İstanbul vs. Antalya DMCs)? — Test with first 5 conversations.
 3. **Türsab partnership ownership:** us or Komtaş? — Decision needed before Month 3.
 4. **Quote auto-send threshold:** ever? — Recommend: never V1, revisit after 6 months of trust data.
 5. **MICE adjacency:** do MICE operators want the same product or a different one? — Don't research V1; pure focus on inbound leisure DMC.
@@ -598,4 +598,4 @@ Track B success would dramatically reduce CAC and unlock the long tail of small 
 - `usecasesv3cleandata.html` — v3 planning artefact (uploaded 2026-05-19)
 - Komtaş Türsab account intelligence (research, 2026-05-19)
 - Komtaş Tourism vertical brief
-- "9 biggest startup ideas" — Greg Isenberg / Jonathan Courtney, May 2026 (AI Juniors positioning frame)
+- "9 biggest startup ideas" — Greg Isenberg / Jonathan Courtney, May 2026 (source for AI-as-staff-replacement frame; adapted to "Asistan" for Turkish market — "junior" dropped)

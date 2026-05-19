@@ -1,14 +1,14 @@
 # PRD — Otel Asistanı
 
 **Product codename:** `otel-asistani`
-**Tagline:** *AI Önbüro Juniorı for independent boutique hotels in Türkiye*
+**Tagline:** *AI Önbüro Asistanı for independent boutique hotels in Türkiye*
 **Status:** Draft v1 · **Owner:** Product · **Last updated:** 2026-05-19
 
 ---
 
 ## 1. Summary
 
-Otel Asistanı is a managed AI agent that performs the work of a junior front-office / reservations employee for independent boutique hotels (30–100 rooms) in Türkiye. It runs on the shared Hermes-based platform (see `ARCHITECTURE.md`) with the `modules/hotel/` vertical pack enabled.
+Otel Asistanı is a managed AI agent that performs the front-office / reservations work for independent boutique hotels (30–100 rooms) in Türkiye. It runs on the shared Hermes-based platform (see `ARCHITECTURE.md`) with the `modules/hotel/` vertical pack enabled.
 
 It does five things, very specifically:
 
@@ -27,9 +27,9 @@ It does **not** do dynamic pricing (that's IDeaS / Duetto), channel management (
 Boutique hotels in Türkiye are caught between two structural pressures:
 
 - **OTA dependence is shrinking margin.** Booking.com and Expedia take 15–25% commission (on gross including VAT and accommodation tax). For a 40-room property in Kapadokya doing ~₺40M/yr revenue, that's ₺6–10M/yr leaving the bottom line. Owners know this but can't out-execute Booking's marketing.
-- **Front office is the operational bottleneck.** Multilingual guest inquiries (Kapadokya alone hosts guests from 170 nationalities), review responses, OTA parity checks, daily revenue tracking, supplier coordination — all done by an owner-operator or a single GM. A junior employee costs ₺40,000–80,000/month fully loaded but works 8 hours, in one language, with weekends off.
+- **Front office is the operational bottleneck.** Multilingual guest inquiries (Kapadokya alone hosts guests from 170 nationalities), review responses, OTA parity checks, daily revenue tracking, supplier coordination — all done by an owner-operator or a single GM. A new front-office hire costs ₺40,000–80,000/month fully loaded but works 8 hours, in one language, with weekends off.
 
-There is no AI product in the Turkish boutique hotel market today that ships an **agentic, multilingual, junior-employee-replacing** workflow. The closest incumbent is HotelRunner (Istanbul HQ, 64K+ accommodations globally) which is moving on the AI side via Autopilot pricing and AI Review Center — but as features bolted onto a channel manager, not as a job-title replacement.
+There is no AI product in the Turkish boutique hotel market today that ships an **agentic, multilingual, front-office-assistant** workflow. The closest incumbent is HotelRunner (Istanbul HQ, 64K+ accommodations globally) which is moving on the AI side via Autopilot pricing and AI Review Center — but as features bolted onto a channel manager, not as a job-title replacement.
 
 **Window:** 6–12 months before HotelRunner or a similar incumbent ships an equivalent product. After that, we are competing on incumbency.
 
@@ -83,7 +83,7 @@ There is no AI product in the Turkish boutique hotel market today that ships an 
 | Persona | Stance | How we win |
 |---|---|---|
 | Owner | Champion (buyer, primary user) | Daily briefing creates immediate "asistan gibi" feeling |
-| GM | Mostly champion (workload reducer) | Frame as "your AI junior" not "your replacement" |
+| GM | Mostly champion (workload reducer) | Frame as "your AI asistan" not "your replacement" |
 | Front-office staff | Mixed — fear of replacement | Position as drafting tool that they review and edit; never auto-send |
 | Bookkeeper / accountant | Neutral | Light touch in V1; will care if PMS integration arrives |
 
@@ -91,11 +91,11 @@ There is no AI product in the Turkish boutique hotel market today that ships an 
 
 ## 5. Positioning
 
-**Headline:** *Bir junior önbüro çalışanının yaptığı işi, yorulmadan, 4 dilde, 7/24 yapar. Ayda ₺50K.*
+**Headline:** *Bir önbüro personelinin yaptığı işi, yorulmadan, 4 dilde, 7/24 yapar. Ayda ₺50K.*
 
 **Anchor comparison (not the software market — the staffing market):**
 
-| | Junior önbüro çalışanı | Otel Asistanı |
+| | Önbüro personeli (yeni alım) | Otel Asistanı |
 |---|---|---|
 | Aylık maliyet (yüklü) | ₺40,000–80,000 | ₺50,000 |
 | Çalışma süresi | 8 saat / gün, 6 gün / hafta | 24 saat / gün, 7 gün / hafta |
@@ -348,7 +348,7 @@ Bugün 14:00'te bahçe düzenleyicisi ile randevu (takvimde)
 
 **Setup fee:** ₺15,000 one-time (covers onboarding labour). Waived for design partners.
 
-**Why ₺50K positioning:** anchor against a junior employee (₺40–80K loaded), not against PMS software (₺3–15K). Every sales conversation that ends up benchmarked against HotelRunner's pricing is a lost deal — disqualify those.
+**Why ₺50K positioning:** anchor against a new front-office hire (₺40–80K loaded), not against PMS software (₺3–15K). Every sales conversation that ends up benchmarked against HotelRunner's pricing is a lost deal — disqualify those.
 
 ---
 
@@ -490,7 +490,7 @@ Inherits the platform stance (`docs/ARCHITECTURE.md` §12). Hotel-specific addit
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | HotelRunner ships equivalent product | High | High | Speed; partnership conversation in parallel; out-execute on staff-replacement framing |
-| ₺50K pricing too high → long sales cycles | High | Medium | Junior-employee anchor framing; design partner program for case studies |
+| ₺50K pricing too high → long sales cycles | High | Medium | Önbüro personeli cost anchor framing; design partner program for case studies |
 | WhatsApp Business approval delays | Medium | Medium | Pre-stage sandbox number; assist with Meta verification |
 | Boutique owners don't trust AI on guest messages | Medium | High | "Never auto-send" default; review-queue UI; trust-building period |
 | PMS integration painful per customer | High | Medium | CSV-import MVP; defer API until V2; build adapter per vendor not per customer |
@@ -505,15 +505,15 @@ Inherits the platform stance (`docs/ARCHITECTURE.md` §12). Hotel-specific addit
 | Competitor | What they do | Where we beat them | Where they beat us |
 |---|---|---|---|
 | HotelRunner | Channel mgr + PMS + AI Review Center + Autopilot pricing | Staff-replacement framing; multi-channel guest comms; no setup fees | Incumbent, 64K accommodations, integrated stack |
-| Heyhotel AI | AI hotel tech, Turkish-NLP-first | "AI Junior" positioning is sharper than "AI hotel tech" | Already in market, claims 500 properties target |
+| Heyhotel AI | AI hotel tech, Turkish-NLP-first | "AI Asistan" positioning is sharper than "AI hotel tech" | Already in market, claims 500 properties target |
 | Elektraweb | PMS leader (5,000+ properties) | Not our category; we sit alongside | Distribution moat in Antalya / coast |
 | Protel A.Ş. | Oracle Hospitality partner | Not our category | Mid-market dominance |
-| Butiksoft | Brand-aligned for boutique | We're a junior employee, they're a PMS | Owns the "butik" Google search term |
+| Butiksoft | Brand-aligned for boutique | We're an asistan, they're a PMS | Owns the "butik" Google search term |
 | Cloudbeds | Global cloud PMS, partnered with Protel TR | Not our category | International capital, scale |
 | Booking Property Tools | Free baseline | Multilingual guest comms not free | Free; ubiquity |
 | ChatGPT / generic LLM | Owner-rolled DIY chatbot | Integrated to PMS + OTA + WhatsApp; daily briefing | Free / cheap |
 
-**Positioning rule:** any sales conversation that drifts into "vs. HotelRunner" is a category-creation conversation. Reframe to "vs. hiring a junior" — that's the comparison we win.
+**Positioning rule:** any sales conversation that drifts into "vs. HotelRunner" is a category-creation conversation. Reframe to "vs. hiring an additional front-office staffer" — that's the comparison we win.
 
 ---
 
@@ -553,4 +553,4 @@ Inherits the platform stance (`docs/ARCHITECTURE.md` §12). Hotel-specific addit
 - `docs/PRD-acente-asistani.md` — sibling product, separate ICP, same platform
 - `skills/*.md` — current general SME skills (to be moved to `general/skills/`)
 - Komtaş Tourism vertical brief (research, 2026-05-19)
-- "9 biggest startup ideas" — Greg Isenberg / Jonathan Courtney, May 2026 (positioning frame: "AI juniors")
+- "9 biggest startup ideas" — Greg Isenberg / Jonathan Courtney, May 2026 (source for AI-as-staff-replacement frame; adapted to "Asistan" for Turkish market — "junior" dropped as culturally off)
