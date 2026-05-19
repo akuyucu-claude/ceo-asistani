@@ -1,0 +1,60 @@
+# modules/acente/connectors/manifest.yaml
+# Declares which Composio MCP connectors this module needs.
+# See docs/PRD-acente-asistani.md §11 (Data sources & integrations)
+
+module: acente
+version: 0.1.0
+
+connectors:
+  required:
+    # MVP — without these the module refuses to start
+    - id: gmail-or-outlook
+      purpose: "Inbound group inquiries (UC-D1)"
+      access: oauth
+      scope: "read on inquiry label only"
+    - id: whatsapp-business
+      purpose: "WhatsApp inquiry triage (UC-D2) — 30-50% of TR DMC inquiries arrive here"
+      approval_lead_time_weeks: 2-4
+    - id: tcmb-rates
+      purpose: "Daily TRY exchange rates (UC-D6)"
+      access: public-no-auth
+
+  optional:
+    # V1
+    - id: google-business-profile
+      purpose: "Operator's own reviews — Friction Map (UC-D3)"
+      approval_lead_time_days: 14
+
+    # V2
+    - id: google-trends-official-api
+      purpose: "Origin market search interest (UC-D4)"
+      status: verify-quota-and-tos-first
+      mvp_fallback: "SerpAPI Google Trends wrapper (~$100/mo)"
+    - id: tga-public-statistics
+      purpose: "Ministry of Culture monthly visitor stats (UC-D4)"
+      access: public-pdf-download
+      cadence: "Monthly release, 4-6 week lag"
+
+    # V3
+    - id: travel-studio
+      purpose: "Operator's existing reservation system — read-only"
+      access: api-key
+    - id: tourplan
+      purpose: "Same — read-only"
+      access: api-key
+    - id: skyscanner-affiliate
+      purpose: "Flight data for inquiry context"
+      status: 4-8-week-approval-required
+
+# Connectors explicitly NOT supported / dropped
+dropped:
+  - id: tripadvisor-content-api
+    reason: "Explicitly prohibited for B2B"
+  - id: viator-scraping
+    reason: "Legal risk; competitor pricing deferred behind legal opinion"
+  - id: gyg-scraping
+    reason: "Same"
+  - id: instagram-hashtag-crawl
+    reason: "Meta aggressive litigation; CNIL precedent"
+  - id: pytrends
+    reason: "Repository archived April 2025"

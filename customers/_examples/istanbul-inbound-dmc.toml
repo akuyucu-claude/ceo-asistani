@@ -1,0 +1,57 @@
+# Example customer profile — Acente Asistanı for an İstanbul inbound DMC
+# Generated from customers/_template/profile.toml
+# Maps to docs/PRD-acente-asistani.md ICP §3
+
+
+[customer]
+slug          = "istanbul-inbound-dmc"
+display_name  = "İstanbul Inbound DMC"
+domain        = "panel.istanbulinbound.com.tr"
+tz            = "Europe/Istanbul"
+contact_email = "ops@istanbulinbound.com.tr"
+
+
+[modules]
+core    = true
+general = true
+hotel   = false
+acente  = true
+
+[modules.acente]
+languages   = ["tr", "en", "de", "ru", "fr", "ar"]
+markets     = ["DE", "RU", "GB", "FR", "SA", "AE", "ES"]
+currencies  = ["TRY", "EUR", "USD", "GBP"]
+team_size   = 12
+peak_months = [4, 5, 6, 7, 8, 9, 10]
+
+
+[connectors]
+gmail              = "credentials/gmail.json"
+google_calendar    = "credentials/gcal.json"
+whatsapp_business  = "credentials/whatsapp.json"
+google_business    = "credentials/gbp.json"
+tcmb_rates         = "credentials/tcmb.json"
+# google_trends    = "credentials/gtrends.json"   # V2 — pending API ToS verification
+
+
+[inference]
+provider          = "kv-router"
+endpoint          = "https://kv-router.avalancheai.tech"
+default_model     = "claude-haiku-4-5"
+sensitive_model   = "claude-sonnet-4-6"
+pii_redaction     = "required"
+monthly_token_cap = 4_000_000                       # higher than otel — more inquiries
+
+
+[gateways]
+whatsapp = true
+telegram = false
+email    = true
+
+
+[deployment]
+vm_provider = "gcp-turkcell"
+region      = "europe-west10"
+vm_class    = "cx32"                                # higher tier — more concurrent inquiry parsing
+created_at  = "2026-06-15T00:00:00+03:00"
+launched_at = "2026-06-22T00:00:00+03:00"

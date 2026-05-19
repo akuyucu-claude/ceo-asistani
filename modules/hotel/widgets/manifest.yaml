@@ -1,0 +1,37 @@
+# modules/hotel/widgets/manifest.yaml
+# Dashboard widgets composed by dashboard/update_dashboard.py when this module
+# is active for a customer.
+
+module: hotel
+version: 0.1.0
+
+widgets:
+  - id: occupancy
+    file: occupancy.html.partial
+    skill_source: sabah-patron-brifingi
+    refresh: hourly
+    status: skeleton
+
+  - id: ota-revenue
+    file: ota-revenue.html.partial
+    skill_source: sabah-patron-brifingi
+    refresh: hourly
+    status: skeleton
+
+  - id: rate-parity
+    file: rate-parity.html.partial
+    skill_source: rate-parity-monitor
+    refresh: hourly
+    status: skeleton
+
+  - id: review-sentiment
+    file: review-sentiment.html.partial
+    skill_source: yorum-yanit-ve-friction-map
+    refresh: daily
+    status: skeleton
+
+  - id: cash-projection
+    file: cash-projection.html.partial
+    skill_source: sezon-cash-flow
+    refresh: weekly
+    status: skeleton  # V2 — depends on PMS integration

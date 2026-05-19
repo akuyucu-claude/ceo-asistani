@@ -1,0 +1,30 @@
+# core/connectors/manifest.yaml
+# Connectors needed by L1 (Core) skills. Loaded for every customer.
+
+module: core
+version: 0.1.0
+
+connectors:
+  required:
+    - id: gmail-or-outlook
+      purpose: "Email read/draft — L1 core"
+      access: oauth
+      providers: [gmail, outlook]
+
+    - id: google-calendar
+      purpose: "Calendar read/write — L1 core"
+      access: oauth
+
+    - id: whatsapp-business
+      purpose: "Primary customer-facing channel in Türkiye"
+      access: meta-business-api
+      approval_lead_time_weeks: 2-4
+
+  optional:
+    - id: telegram-bot
+      purpose: "Secondary channel for customers that prefer it"
+      access: bot-token
+
+    - id: drive-or-onedrive
+      purpose: "Document indexing beyond vault"
+      access: oauth

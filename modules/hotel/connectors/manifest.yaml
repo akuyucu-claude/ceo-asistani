@@ -1,0 +1,51 @@
+# modules/hotel/connectors/manifest.yaml
+# Declares which Composio MCP connectors this module needs.
+# See docs/PRD-otel-asistani.md §11 (Data sources & integrations)
+
+module: hotel
+version: 0.1.0
+
+connectors:
+  required:
+    # MVP — without these the module refuses to start
+    - id: whatsapp-business
+      purpose: "Guest WhatsApp inbound/outbound (UC-H3)"
+      approval_lead_time_weeks: 2-4
+    - id: google-business-profile
+      purpose: "Operator's own reviews (UC-H4)"
+      approval_lead_time_days: 14
+    - id: booking-extranet
+      purpose: "Rate parity + bookings (UC-H2)"
+      access: operator-credentials
+
+  optional:
+    # V1 — improve coverage but not blockers
+    - id: expedia-partner-central
+      purpose: "Second OTA for rate parity (UC-H2)"
+      access: operator-credentials
+    - id: hotelrunner
+      purpose: "Read-only channel manager data — if customer subscribes"
+      access: api-key
+    - id: agoda-extranet
+      purpose: "Third OTA for rate parity"
+      access: operator-credentials
+
+    # V2 — PMS integrations
+    - id: elektraweb-pms
+      purpose: "Occupancy, ADR, RevPAR — primary Turkish boutique PMS (5,000+ properties)"
+      access: api-credentials
+      mvp_fallback: "Daily CSV export to designated S3 bucket"
+    - id: protel-pms
+      purpose: "Mid-market PMS — Oracle partner"
+      access: api-credentials
+      mvp_fallback: "Daily CSV export"
+
+    # V3 — TripAdvisor not available (B2B API forbidden); manual upload only
+    # V3 — Otelz / TatilSepeti / TatilBudur if customer uses them
+
+# Connectors explicitly NOT supported / dropped
+dropped:
+  - id: tripadvisor-content-api
+    reason: "Explicitly prohibited for B2B per TripAdvisor FAQ"
+  - id: viator-scraping
+    reason: "Legal risk post-Meta v. Bright Data (2024)"

@@ -1,0 +1,59 @@
+# Example customer profile — Otel Asistanı in Kapadokya
+# Generated from customers/_template/profile.toml
+# Maps to docs/PRD-otel-asistani.md ICP §3 (Tier 1 beachhead)
+
+
+[customer]
+slug          = "kapadokya-cave-otel"
+display_name  = "Kapadokya Cave Otel"
+domain        = "dashboard.kapadokyacaveotel.com.tr"
+tz            = "Europe/Istanbul"
+contact_email = "info@kapadokyacaveotel.com.tr"
+
+
+[modules]
+core    = true
+general = true
+hotel   = true
+acente  = false
+
+[modules.hotel]
+beachhead                 = "kapadokya"
+languages                 = ["tr", "en", "ru", "de"]
+auto_send_threshold       = "faq-only"
+brand_voice               = "warm-formal-tr"
+seasonal_pattern_baseline = "year-round-low-winter"
+room_count                = 42
+
+
+[connectors]
+gmail              = "credentials/gmail.json"
+google_calendar    = "credentials/gcal.json"
+whatsapp_business  = "credentials/whatsapp.json"
+google_business    = "credentials/gbp.json"
+booking_extranet   = "credentials/booking.json"
+expedia_extranet   = "credentials/expedia.json"
+# elektraweb_pms   = "credentials/elektraweb.json"   # V2 — CSV import only in MVP
+
+
+[inference]
+provider          = "kv-router"
+endpoint          = "https://kv-router.avalancheai.tech"
+default_model     = "claude-haiku-4-5"
+sensitive_model   = "claude-sonnet-4-6"
+pii_redaction     = "required"
+monthly_token_cap = 2_000_000
+
+
+[gateways]
+whatsapp = true
+telegram = false
+email    = true
+
+
+[deployment]
+vm_provider = "gcp-turkcell"
+region      = "europe-west10"
+vm_class    = "cx22-equivalent"
+created_at  = "2026-06-01T00:00:00+03:00"
+launched_at = "2026-06-07T00:00:00+03:00"

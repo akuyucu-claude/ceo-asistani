@@ -1,0 +1,109 @@
+# =============================================================================
+# Customer Profile Template — Hermes-based Vertical AI Asistan Platform
+# =============================================================================
+#
+# Copy this file to customers/<slug>/profile.toml and fill in the placeholders.
+# This file is the single source of truth for what a customer's deployment
+# does: which modules load, which connectors are active, which languages
+# are supported.
+#
+# See docs/ARCHITECTURE.md §3 (skill layers), §4 (skill frontmatter contract).
+# =============================================================================
+
+
+[customer]
+slug         = "REPLACE_ME"                    # lowercase-dashed slug, used in paths
+display_name = "REPLACE_ME"                    # shown on dashboard
+domain       = "dashboard.REPLACE_ME.com.tr"   # the customer-facing URL
+tz           = "Europe/Istanbul"
+contact_email = "contact@REPLACE_ME.com.tr"
+
+
+# -----------------------------------------------------------------------------
+# Modules — which skill layers load for this customer.
+# core + general are always true. The vertical module is the product.
+# -----------------------------------------------------------------------------
+
+[modules]
+core    = true       # L1 — always on
+general = true       # L2 — always on
+hotel   = false      # L3 — Otel Asistanı product
+acente  = false      # L3 — Acente Asistanı product
+
+# Configuration block for the vertical module (only the active one is read).
+
+# ---- Otel Asistanı specific -------------------------------------------------
+# [modules.hotel]
+# beachhead             = "kapadokya"        # kapadokya | istanbul | bodrum
+# languages             = ["tr", "en", "ru", "de"]
+# auto_send_threshold   = "faq-only"          # faq-only | confident | never
+# brand_voice           = "warm-formal-tr"
+# seasonal_pattern_baseline = "year-round-low-winter"
+# room_count            = 0
+
+# ---- Acente Asistanı specific -----------------------------------------------
+# [modules.acente]
+# languages   = ["tr", "en", "de", "ru", "fr", "ar"]
+# markets     = ["DE", "RU", "GB", "FR", "SA", "AE", "ES"]
+# currencies  = ["TRY", "EUR", "USD", "GBP"]
+# team_size   = 0
+# peak_months = [4, 5, 6, 7, 8, 9, 10]
+
+
+# -----------------------------------------------------------------------------
+# Connectors — paths to encrypted credential files (relative to /opt/<slug>/).
+# Hermes/Composio loads each only if the active modules' manifests require it.
+# -----------------------------------------------------------------------------
+
+[connectors]
+# Always required for any module that touches L1/L2
+# gmail                 = "credentials/gmail.json"
+# google_calendar       = "credentials/gcal.json"
+# whatsapp_business     = "credentials/whatsapp.json"
+
+# Hotel-specific (only if modules.hotel = true)
+# google_business       = "credentials/gbp.json"
+# booking_extranet      = "credentials/booking.json"
+# expedia_extranet      = "credentials/expedia.json"
+# hotelrunner           = "credentials/hotelrunner.json"
+# elektraweb_pms        = "credentials/elektraweb.json"
+# protel_pms            = "credentials/protel.json"
+
+# Acente-specific (only if modules.acente = true)
+# tcmb_rates            = "credentials/tcmb.json"       # public, but keep cred path consistent
+# google_trends         = "credentials/gtrends.json"
+
+
+# -----------------------------------------------------------------------------
+# Inference — KV Router routing and cost controls per customer.
+# -----------------------------------------------------------------------------
+
+[inference]
+provider          = "kv-router"
+endpoint          = "https://kv-router.avalancheai.tech"
+default_model     = "claude-haiku-4-5"
+sensitive_model   = "claude-sonnet-4-6"   # routed when PII detected
+pii_redaction     = "required"
+monthly_token_cap = 2_000_000             # if hit, demote to cheap model + alert
+
+
+# -----------------------------------------------------------------------------
+# Gateways — customer-facing channels.
+# -----------------------------------------------------------------------------
+
+[gateways]
+whatsapp = true
+telegram = false
+email    = true
+
+
+# -----------------------------------------------------------------------------
+# Deployment metadata — used by setup_customer.sh and audit.
+# -----------------------------------------------------------------------------
+
+[deployment]
+vm_provider  = "hetzner"                # hetzner | gcp-turkcell
+region       = "fra1"                    # fra1 | europe-west10
+vm_class     = "cx22"
+created_at   = "REPLACE_ME"              # ISO-8601 at provision time
+launched_at  = "REPLACE_ME"              # ISO-8601 at go-live

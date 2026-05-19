@@ -1,0 +1,37 @@
+# modules/acente/widgets/manifest.yaml
+# Dashboard widgets composed by dashboard/update_dashboard.py when this module
+# is active for a customer.
+
+module: acente
+version: 0.1.0
+
+widgets:
+  - id: inquiry-queue
+    file: inquiry-queue.html.partial
+    skill_source: inquiry-to-itinerary
+    refresh: realtime
+    status: skeleton
+
+  - id: conversion-funnel
+    file: conversion-funnel.html.partial
+    skill_source: quote-followup-conversion
+    refresh: daily
+    status: skeleton
+
+  - id: friction-map
+    file: friction-map.html.partial
+    skill_source: post-tour-friction-map
+    refresh: monthly
+    status: skeleton
+
+  - id: origin-market-heatmap
+    file: origin-market-heatmap.html.partial
+    skill_source: origin-market-pulse
+    refresh: monthly
+    status: skeleton  # V2
+
+  - id: currency-exposure
+    file: currency-exposure.html.partial
+    skill_source: multi-currency-kur
+    refresh: daily
+    status: skeleton
