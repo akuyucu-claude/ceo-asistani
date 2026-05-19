@@ -1,0 +1,65 @@
+# Hermes profile distribution manifest for Acente Asistanı.
+# Read by `hermes profile install` after build_distribution.sh assembles the
+# distribution from layered source (core/ + general/ + modules/acente/).
+#
+# Format reference:
+# /usr/local/lib/hermes-agent/website/docs/user-guide/profile-distributions.md
+
+name: acente-asistani
+version: 0.1.0-skeleton
+description: "AI Rezervasyon Asistanı for inbound DMCs and tour operators in Türkiye"
+hermes_requires: ">=0.14.0"
+author: "akuyucu-claude / CEO Asistanı"
+license: MIT
+homepage: "https://github.com/akuyucu-claude/ceo-asistani"
+
+env_requires:
+  # --- LLM provider (one of these required) ---
+  - name: OPENROUTER_API_KEY
+    description: "OpenRouter API key — recommended for dev / design partner stage"
+    required: false
+  - name: ANTHROPIC_API_KEY
+    description: "Anthropic API key — recommended for KVKK-sensitive production"
+    required: false
+
+  # --- Gateways ---
+  - name: GMAIL_OAUTH
+    description: "Path to Gmail OAuth credentials JSON — UC-D1 (inquiry inbox). Required for MVP."
+    required: true
+    default: "credentials/gmail.json"
+  - name: WHATSAPP_BUSINESS_TOKEN
+    description: "Meta WhatsApp Business token — UC-D2 (30-50% of TR DMC inquiries arrive here)"
+    required: true
+  - name: WHATSAPP_BUSINESS_PHONE_ID
+    description: "Meta WhatsApp Business phone number ID"
+    required: true
+
+  # --- Connectors ---
+  - name: GOOGLE_BUSINESS_PROFILE_OAUTH
+    description: "GBP OAuth credentials — UC-D3 (Friction Map). V1, optional."
+    required: false
+    default: "credentials/gbp.json"
+
+  # --- KV Router (sovereign inference proxy) ---
+  - name: KV_ROUTER_ENDPOINT
+    description: "Optional sovereign inference proxy endpoint (KVKK production)"
+    required: false
+    default: "https://kv-router.avalancheai.tech"
+  - name: KV_ROUTER_KEY
+    description: "API key for KV Router (only if KV_ROUTER_ENDPOINT set)"
+    required: false
+
+  # --- Reference data (V2) ---
+  - name: GOOGLE_TRENDS_API_KEY
+    description: "Google Trends Official API key — UC-D4 (V2; verify ToS+quota first)"
+    required: false
+
+
+distribution_owned:
+  - SOUL.md
+  - config.yaml
+  - mcp.json
+  - skills/
+  - cron/
+  - distribution.yaml
+  - README.md

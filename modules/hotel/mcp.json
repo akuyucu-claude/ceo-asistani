@@ -1,0 +1,4 @@
+{
+  "_README": "MCP server connections for Otel Asistanı. Skeleton — fill with actual Composio MCP package names + per-customer credential paths during customer onboarding. See modules/hotel/connectors/manifest.yaml for the list of expected connectors and their roles. Real Composio package names and command syntax to be verified during first customer pilot. Empty mcpServers={} ships as a valid Hermes config that simply has no MCP-backed tools active until populated.",
+  "mcpServers": {}
+}

@@ -1,0 +1,40 @@
+# Hermes config for acente-asistani profile distribution.
+
+model:
+  # Default model — Sonnet for inquiry-to-itinerary (quality matters,
+  # quote correctness has compound financial impact)
+  default: "anthropic/claude-sonnet-4-6"
+  provider: "auto"
+  base_url: "https://openrouter.ai/api/v1"
+
+# Per-skill model — triage / follow-up can run on Haiku
+model_overrides:
+  whatsapp-inquiry-triage:    "anthropic/claude-haiku-4-5"
+  quote-followup-conversion:  "anthropic/claude-haiku-4-5"
+  multi-currency-kur:         "anthropic/claude-haiku-4-5"
+  origin-market-pulse:        "anthropic/claude-haiku-4-5"
+
+fallback:
+  - "anthropic/claude-sonnet-4-6"
+  - "google/gemini-2.5-pro"
+  - "openai/gpt-4o"
+
+system:
+  language_preference: tr
+  timezone: Europe/Istanbul
+  reasoning_effort: medium
+
+tools:
+  whatsapp:
+    enabled: true
+    auto_send_threshold: "never"     # acente: HİÇBİR quote auto-send (PRD §6 UC-D2)
+  telegram:
+    enabled: false
+  email:
+    enabled: true
+
+hooks:
+  pre_skill:
+    - "kv-router-pii-check"
+  post_skill:
+    - "audit-log"

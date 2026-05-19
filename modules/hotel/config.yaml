@@ -1,0 +1,49 @@
+# Hermes config for otel-asistani profile distribution.
+# Customer-side overrides land in their .env; this file is the distribution
+# default that ships to every customer.
+
+model:
+  # Default model — Haiku for triage/FAQ/daily briefing (cost-efficient)
+  default: "anthropic/claude-haiku-4-5"
+  # Auto-detect from .env (OPENROUTER_API_KEY or ANTHROPIC_API_KEY)
+  provider: "auto"
+  base_url: "https://openrouter.ai/api/v1"
+
+# Per-skill model upgrade — high-stakes skills get Sonnet.
+# Hermes reads these when invoking the specific skill.
+model_overrides:
+  yorum-yanit-ve-friction-map: "anthropic/claude-sonnet-4-6"
+  sezon-cash-flow:             "anthropic/claude-sonnet-4-6"
+
+# Fallback chain — if primary model fails, try these in order.
+fallback:
+  - "anthropic/claude-haiku-4-5"
+  - "google/gemini-2.5-flash"
+  - "openai/gpt-4o-mini"
+
+# System defaults
+system:
+  language_preference: tr
+  timezone: Europe/Istanbul
+  reasoning_effort: low      # raise to "medium" for cash-flow / friction-map at runtime
+
+# Tool defaults — which tools enabled per platform.
+# WhatsApp is first-class for Türkiye.
+tools:
+  whatsapp:
+    enabled: true
+    auto_send_threshold: "faq-only"   # faq-only | confident | never
+  telegram:
+    enabled: false
+  email:
+    enabled: true
+
+# Hooks — pre-/post-skill execution
+hooks:
+  pre_skill:
+    - "kv-router-pii-check"           # PII redaction before LLM call (if KV_ROUTER set)
+  post_skill:
+    - "audit-log"                     # write every invocation to vault/audit/
+
+# Skills are auto-discovered from skills/ directory after `hermes profile install`.
+# No explicit enabled_skills list — all bundled skills are active.

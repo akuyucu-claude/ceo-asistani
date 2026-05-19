@@ -1,0 +1,4 @@
+{
+  "_README": "MCP server connections for Acente Asistanı. Skeleton — fill with actual Composio MCP package names + per-customer credential paths during onboarding. See modules/acente/connectors/manifest.yaml for the list of expected connectors. Real Composio package names to be verified during first customer pilot.",
+  "mcpServers": {}
+}

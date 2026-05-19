@@ -1,0 +1,72 @@
+# Hermes profile distribution manifest for Otel Asistanı.
+# Read by `hermes profile install` after build_distribution.sh assembles the
+# distribution from layered source (core/ + general/ + modules/hotel/).
+#
+# Format reference:
+# /usr/local/lib/hermes-agent/website/docs/user-guide/profile-distributions.md
+
+name: otel-asistani
+version: 0.1.0-skeleton
+description: "AI Önbüro Asistanı for independent boutique hotels in Türkiye (Kapadokya beachhead)"
+hermes_requires: ">=0.14.0"
+author: "akuyucu-claude / CEO Asistanı"
+license: MIT
+homepage: "https://github.com/akuyucu-claude/ceo-asistani"
+
+# Env vars checked against installer's shell + target profile's .env.
+# Marked `✓ set` or `needs setting` during install — installer fills them in.
+env_requires:
+  # --- LLM provider (one of these required) ---
+  - name: OPENROUTER_API_KEY
+    description: "OpenRouter API key — recommended for dev / design partner stage (200+ models, single key)"
+    required: false
+  - name: ANTHROPIC_API_KEY
+    description: "Anthropic API key — recommended for KVKK-sensitive production (single-hop routing)"
+    required: false
+
+  # --- Gateways ---
+  - name: WHATSAPP_BUSINESS_TOKEN
+    description: "Meta WhatsApp Business API token — UC-H3 (guest comms). Required for MVP."
+    required: true
+  - name: WHATSAPP_BUSINESS_PHONE_ID
+    description: "Meta WhatsApp Business phone number ID"
+    required: true
+
+  # --- Connectors (operator-granted) ---
+  - name: GOOGLE_BUSINESS_PROFILE_OAUTH
+    description: "Path to GBP OAuth credentials JSON — UC-H4 (review responses)"
+    required: true
+    default: "credentials/gbp.json"
+  - name: BOOKING_EXTRANET_CREDENTIALS
+    description: "Path to Booking.com extranet credentials JSON — UC-H2 (rate parity)"
+    required: true
+    default: "credentials/booking.json"
+  - name: EXPEDIA_EXTRANET_CREDENTIALS
+    description: "Path to Expedia Partner Central credentials — UC-H2 (V1, optional)"
+    required: false
+    default: "credentials/expedia.json"
+  - name: ELEKTRAWEB_PMS_CREDENTIALS
+    description: "Elektraweb PMS API credentials — UC-H5 (V2, optional; CSV import fallback in MVP)"
+    required: false
+    default: "credentials/elektraweb.json"
+
+  # --- KV Router (sovereign inference proxy) ---
+  - name: KV_ROUTER_ENDPOINT
+    description: "Optional sovereign inference proxy endpoint (KVKK production)"
+    required: false
+    default: "https://kv-router.avalancheai.tech"
+  - name: KV_ROUTER_KEY
+    description: "API key for KV Router (only if KV_ROUTER_ENDPOINT set)"
+    required: false
+
+
+# Distribution-owned files — replaced on `hermes profile update`.
+# User-owned (memories, sessions, .env, auth.json) — never touched by updates.
+distribution_owned:
+  - SOUL.md
+  - config.yaml
+  - mcp.json
+  - skills/
+  - cron/
+  - distribution.yaml
+  - README.md

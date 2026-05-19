@@ -42,7 +42,17 @@ Router inference (sovereign, KVKK uyumlu) üzerine kurulu. Dikey modüller
 
 Tam mimari: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
-## Hızlı başlangıç (yeni müşteri)
+## Hızlı başlangıç
+
+### Önce: Hermes'i VM'e kur
+
+```bash
+bash deploy/install_hermes.sh
+# Sonra: OPENROUTER_API_KEY veya ANTHROPIC_API_KEY .env'ye ekle
+echo 'OPENROUTER_API_KEY=sk-or-...' >> ~/.hermes/.env
+```
+
+### Yeni müşteri provision'la (Hermes-native, 5 adım)
 
 ```bash
 # Otel müşterisi — Kapadokya boutique
@@ -62,58 +72,100 @@ bash deploy/setup_customer.sh \
 ```
 
 Script şunları yapar:
-1. `customers/<slug>/profile.toml` üretir
-2. `/opt/<slug>/` runtime dizinleri açar (vault, credentials, hermes, logs)
-3. Aktif modüllerin `vault-schema/`'larını customer vault'una kopyalar
-4. Aktif modüllerin skill'lerini Hermes profile'ına symlink eder
-5. Hermes profile create (CLI yoksa uyarı)
-6. Dashboard deploy + nginx + SSL (opsiyonel)
-7. Systemd timer kurar (yoksa cron'a düşer)
-8. Operator için imzalı KVKK DPA + OAuth grants + WhatsApp Business
-   approval gibi sonraki adımları yazdırır
+1. **Validate** — slug, domain, module list (core + general + vertical)
+2. **Build distribution** — `build_distribution.sh` source'tan
+   `distributions/<dist-name>/` üretir (skills wrapped, manifest hazır)
+3. **Install** — `hermes profile install <built-dir> --name <slug> --alias`
+   — Hermes auto-generates `.env.EXAMPLE`, skill'leri yükler, MCP'yi register'lar
+4. **Customer vault initialize** — `modules/<x>/vault-schema/` →
+   `/opt/<slug>/vault/modules/<x>/` + `customers/<slug>/profile.toml`
+   audit snapshot yazılır
+5. **Deploy dashboard** + nginx + SSL + operator checklist
 
 `--dry-run` ile hiçbir şey değiştirmeden ne yapacağını gösterir.
+
+### Customer üzerinden agent kullan
+
+Install sonrası:
+
+```bash
+# Talk to the customer's agent
+hermes -p kapadokya-cave-otel chat
+
+# Or via alias (created by --alias flag)
+kapadokya-cave-otel chat
+
+# Configure WhatsApp Business
+hermes -p kapadokya-cave-otel whatsapp setup
+
+# Check status
+hermes -p kapadokya-cave-otel status
+```
+
+### Distribution güncelleme
+
+`modules/<vertical>/` source'unda değişiklik yapınca:
+
+```bash
+# Rebuild
+bash deploy/build_distribution.sh hotel --force
+
+# Re-install on customer VM
+hermes profile update kapadokya-cave-otel
+
+# Customer'ın .env, sessions, memories KORUNUR
+```
 
 ## Repo yapısı
 
 ```
 ceo-asistani/
-├── docs/                                # PRD'ler + mimari
+├── docs/                                # PRD'ler + mimari + entegrasyon
 │   ├── ARCHITECTURE.md
+│   ├── HERMES-INTEGRATION.md
 │   ├── PRD-otel-asistani.md
 │   └── PRD-acente-asistani.md
 │
-├── core/                                # L1 — her customer
+├── core/                                # L1 SOURCE — her customer
 │   ├── skills/  (email, takvim, görev, whatsapp, ...)
 │   └── connectors/manifest.yaml
 │
-├── general/                             # L2 — her SME, her vertical
+├── general/                             # L2 SOURCE — her SME
 │   └── skills/  (nakit-akış, gündem, evrak, ik, delegasyon, radar)
 │
-├── modules/                             # L3 — dikey paketler
-│   ├── hotel/                           # Otel Asistanı
+├── modules/                             # L3 SOURCE — dikey ürünler
+│   ├── hotel/                           # Otel Asistanı kaynak
+│   │   ├── distribution.yaml            # Hermes manifest
+│   │   ├── SOUL.md                      # agent personality
+│   │   ├── config.yaml                  # model + tool defaults
+│   │   ├── mcp.json                     # MCP server config
 │   │   ├── skills/  (5 UC: UC-H1..H5)
-│   │   ├── connectors/manifest.yaml
-│   │   ├── vault-schema/
-│   │   └── widgets/manifest.yaml
-│   └── acente/                          # Acente Asistanı
-│       ├── skills/  (6 UC: UC-D1..D6)
-│       ├── connectors/manifest.yaml
-│       ├── vault-schema/
-│       └── widgets/manifest.yaml
+│   │   ├── connectors/manifest.yaml     # connector katalogu (build kaynağı)
+│   │   ├── vault-schema/                # customer vault iskeleti
+│   │   ├── widgets/manifest.yaml        # dashboard widget'ları
+│   │   └── cron/                        # Hermes cron tasks
+│   └── acente/                          # Acente Asistanı (aynı yapı, 6 UC)
 │
-├── customers/                           # Per-customer profile.toml
-│   ├── _template/profile.toml           # Kanonik şablon
-│   └── _examples/  (Kapadokya otel + İstanbul DMC örnekleri)
+├── distributions/                       # BUILD TARGET — build_distribution.sh çıktısı
+│   ├── README.md
+│   ├── otel-asistani/                   # → hermes profile install <bu dir>
+│   └── acente-asistani/
+│
+├── customers/                           # Per-customer SNAPSHOT (audit)
+│   ├── README.md
+│   ├── _template/profile.toml
+│   └── <slug>/profile.toml              # setup_customer.sh tarafından yazılır
 │
 ├── dashboard/                           # Statik HTML + Python renderer
 ├── deploy/
-│   ├── setup_customer.sh                # Modular onboarding
-│   └── setup_customer.legacy.sh         # Eski tek-vertical script
+│   ├── install_hermes.sh                # Customer VM'e Hermes kur
+│   ├── build_distribution.sh            # Source → distribution build
+│   ├── setup_customer.sh                # Slim Hermes-native onboarding (5 adım)
+│   └── setup_customer.legacy.sh         # Eski monolitik script (deprecated)
 ├── admin/                               # Operator admin paneli
 ├── nginx/                               # Nginx config şablonları
 └── vault/                               # Legacy template (deprecated;
-                                         #   yerini modules/<x>/vault-schema/ aldı)
+                                         #   modules/<x>/vault-schema/ aldı)
 ```
 
 ## Teknoloji
@@ -157,13 +209,16 @@ migration safety check (`ARCHITECTURE.md §13`).
 |---|---|
 | PRD'ler (Otel + Acente) | ✓ Stabil |
 | Mimari dokümanı | ✓ Stabil |
-| Modül iskeletleri | ✓ Skeleton dosyalar var |
-| `setup_customer.sh` (modular) | ✓ Çalışır (dry-run + happy path) |
-| Skill implementation'ları | ⏳ Skeleton — implementation pending |
-| Composio MCP connector kodları | ⏳ Manifestler hazır, kod yok |
-| WhatsApp gateway adapter | ⏳ Tasarım var, kod yok |
-| Dashboard widget composition | ⏳ Manifestler hazır, monolitik renderer henüz değişmedi |
+| Hermes entegrasyonu | ✓ **Build → install zinciri test edildi** (v0.14.0) |
+| Distribution metadata (distribution.yaml + SOUL.md + config.yaml + mcp.json) | ✓ Her iki ürün için yazıldı |
+| `build_distribution.sh` | ✓ Çalışır (hotel: 19 skill, acente: 20 skill) |
+| `setup_customer.sh` (slim, Hermes-native) | ✓ End-to-end test edildi |
+| `install_hermes.sh` | ✓ Customer VM için hazır |
+| Skill implementation'ları | ⏳ Frontmatter + workflow özeti var, kod yok |
+| MCP server kodları (Composio package isimleri) | ⏳ mcp.json stub — pilot'ta doldurulacak |
+| Dashboard widget composition | ⏳ Manifestler var, renderer monolitik |
 | KVKK DPA template | ⏳ Hukuk masrafı bekleniyor |
+| Production runtime test (gerçek LLM çağrısı) | ⏳ Hetzner VM'de bekleniyor |
 
 ## Lisans
 

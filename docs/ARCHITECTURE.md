@@ -322,34 +322,67 @@ Hetzner Cloud (or GCP europe-west10)
 
 ---
 
-## 11. Onboarding script
+## 11. Onboarding pipeline (Hermes-native)
 
-`deploy/setup_customer.sh` is the one-shot onboarding entrypoint:
+After actual Hermes integration (see `docs/HERMES-INTEGRATION.md`), the
+onboarding pipeline became **build → install → initialise** — 5 steps,
+because Hermes natively handles what we previously open-coded.
+
+### 11.1 Build the distribution
+
+```bash
+bash deploy/build_distribution.sh hotel
+```
+
+Assembles `distributions/<dist-name>/` from layered source
+(`core/` + `general/` + `modules/<vertical>/`):
+
+- Distribution metadata (`distribution.yaml`, `SOUL.md`, `config.yaml`, `mcp.json`) copied as-is
+- Each skill `.md` wrapped into `skills/<name>/SKILL.md` directory form
+  (Hermes convention)
+- Cron jobs copied
+- Build receipt `README.md` written
+
+### 11.2 Provision a customer
 
 ```bash
 bash deploy/setup_customer.sh \
   --slug kapadokya-cave-otel \
   --domain dashboard.kapadokyacaveotel.com.tr \
   --modules core,general,hotel \
-  --beachhead kapadokya \
-  --languages tr,en,ru,de
+  --languages tr,en,ru,de \
+  --beachhead kapadokya
 ```
 
-Steps performed:
+Steps:
 
-1. Provision `/opt/<slug>/` directory tree
-2. Generate `profile.toml` from flags
-3. Copy active modules' `vault-schema/` into the customer vault
-4. Initialise Hermes profile (`hermes profile create <slug>`)
-5. Symlink active skill paths into Hermes skill dir
-6. Install required connectors (Composio MCP) — print OAuth URLs for operator
-7. Deploy dashboard HTML + Python renderer
-8. Configure nginx + Let's Encrypt
-9. Install systemd timers for scheduled skills (`gunluk-rapor`, `rate-parity-monitor`, etc.)
-10. Run initial render
-11. Print operator next-step checklist (DPA signature, OAuth grants, Booking extranet credentials)
+1. **Validate** — slug, domain, modules (core + general + one vertical required)
+2. **Build** the distribution from source (calls `build_distribution.sh`)
+3. **Install** into Hermes (`hermes profile install <built-dir> --name <slug> --alias`)
+   — Hermes auto-generates `.env.EXAMPLE` from `distribution.yaml` `env_requires:`
+4. **Initialise customer vault** — copy `modules/<x>/vault-schema/`
+   contents into `/opt/<slug>/vault/modules/<x>/` (business data templates)
+   — and write `customers/<slug>/profile.toml` as audit snapshot
+5. **Deploy dashboard** + nginx + SSL + print operator checklist
 
-The current `setup_customer.sh` is monolithic and assumes one vertical. Refactoring it to honour `--modules` is part of the implementation work.
+### 11.3 What Hermes handles natively (no longer our concern)
+
+- Skill loading (the installed distribution is auto-active)
+- Per-profile config (`config.yaml` shipped in distribution)
+- MCP server registry (`mcp.json` shipped in distribution)
+- Cron scheduling (`cron/*.json` in distribution; managed by `hermes cron`)
+- Gateway management (`hermes whatsapp setup` / `hermes gateway`)
+- Inference provider (auto-detected from `.env`)
+
+### 11.4 What we still own
+
+- Customer business **vault** (Obsidian-style markdown business data,
+  `/opt/<slug>/vault/`) — separate from Hermes's `memories/`
+- Customer-facing **dashboard** (`/var/www/<slug>/`)
+- nginx + SSL
+- KVKK DPA template + customer contracts
+- Operator onboarding workflow + checklist
+- Per-customer profile **snapshot** (`customers/<slug>/profile.toml`) — audit only
 
 ---
 
@@ -367,16 +400,38 @@ Note: KVKK is structural here, not a sales lead. Both PRDs deliberately position
 
 ## 13. What Hermes is — and isn't
 
-**Hermes is:**
+**Hermes is** (verified against v0.14.0):
 - The agent runtime (skill loader, tool dispatcher, LLM client wrapper)
-- The MCP host
-- The gateway adapter framework
-- Configurable per-profile
+- The MCP host (`hermes mcp` + `mcp.json` per profile)
+- The gateway adapter framework (`hermes whatsapp setup`, `hermes gateway`)
+- The profile distribution mechanism (`hermes profile install <git-url-or-dir>`)
+- The cron scheduler (`hermes cron` + `cron/*.json` per profile)
+- The inference provider router (auto-detects from `.env`: OpenRouter,
+  Anthropic, OpenAI, Nous Portal, Gemini, and many more)
 
 **Hermes is NOT:**
-- Our product. The product is in `modules/`, `connectors/`, `vault-schema/`, `widgets/`, and the GTM around them.
-- Our moat. If Hermes is abandoned, we re-target Claude Agent SDK or LangGraph and our skills + vault + modules survive intact.
-- A fixed dependency. The skill markdown format is portable; the MCP standard is portable; the vault is plain markdown. The runtime is replaceable.
+- Our product. The product is in `modules/<vertical>/` (skills + vault-schema
+  + distribution metadata), the build pipeline (`build_distribution.sh`),
+  the customer vault concept, the dashboard, and the GTM.
+- Our moat. If Hermes is abandoned, we re-target Claude Agent SDK or
+  LangGraph. Our skills (markdown), vault (plain markdown), distribution
+  metadata (yaml/json) all survive the runtime swap.
+- A fixed dependency. The skill markdown format is portable
+  (agentskills.io standard); MCP is portable; the vault is plain
+  markdown; `distribution.yaml` is a manifest, not a runtime artefact.
+
+**Verified integration points** (tested 2026-05-19):
+- `build_distribution.sh hotel` → `distributions/otel-asistani/` ✓
+- `hermes profile install distributions/otel-asistani --name <slug> --alias` ✓
+- `.env.EXAMPLE` auto-generated from `distribution.yaml` `env_requires:` ✓
+- 19 skills (7 core + 7 general + 5 hotel) correctly loaded into profile ✓
+- Customer-side runtime test (actual LLM call) blocked by sandbox network policy;
+  must be tested on Hetzner customer VM where outbound is open.
+
+**Migration safety check (run quarterly):** can we rebuild the runtime layer
+in 4 weeks if Hermes is end-of-lifed tomorrow? Re-test by replacing
+`hermes profile install` with a Claude Agent SDK equivalent and verifying
+skills + vault + distribution manifest still drive a working agent.
 
 **Migration safety check (run quarterly):** can we rebuild the runtime layer in 4 weeks if Hermes is end-of-lifed tomorrow? If the answer drifts toward no, we have leaked IP into runtime configuration. Fix it.
 
